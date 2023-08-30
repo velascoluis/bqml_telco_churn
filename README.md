@@ -3,7 +3,7 @@
 This repository contains an example of a Gen-AI powered data transformation.
 The use case is automated summary and content generation for telco customer churn data.
 
-This repository inspired on [Telco Customer Churn Analysis in BigQuery with Gen-AI](https://medium.com/@sobhan.af/telco-customer-churn-analysis-in-bigquery-with-gen-ai-73a02f119cbd)
+This repository inspired on [Telco Customer Churn Analysis in BigQuery with Gen-AI](https://medium.com/@sobhan.af/telco-customer-churn-analysis-in-bigquery-with-gen-ai-73a02f119cbd) by [Sobhan A](https://medium.com/@sobhan.af)
 
 
 ## Architecture
