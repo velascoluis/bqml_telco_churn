@@ -1,0 +1,92 @@
+# ............................................................
+# STREAMLIT App
+# ............................................................
+
+import streamlit as st 
+import datetime, time
+import requests
+import pandas_gbq
+import pandas as pd
+import json
+import plotly.express as px
+
+from google.cloud import bigquery
+
+PROJECT_ID = "___PROJECT_ID___"
+DATASET_ID="telco_llm"
+TABLE_ID="customer_churn"
+CFN_TRIGGER = "___CFN_TRIGGER___"
+CFN_TRIGGER_CREATIVE = "___CFN_TRIGGER____creative"
+
+
+def batch_inference():
+    data = {"table_name": TABLE_ID, "dataset_name": DATASET_ID}
+    requests.post(CFN_TRIGGER,  json=data)
+    st.success("Batch successfully executed!")
+
+def batch_inference_creative(customer_id):
+    data = {"table_name": TABLE_ID, "dataset_name": DATASET_ID, "customer_id": customer_id}
+    return requests.post(CFN_TRIGGER_CREATIVE,  json=data)
+
+def read_table_dataframe(table_name):
+    client = bigquery.Client()
+    dataset_ref = bigquery.DatasetReference(PROJECT_ID, DATASET_ID)
+    table_ref = dataset_ref.table(table_name)
+    table = client.get_table(table_ref)
+    df = client.list_rows(table).to_dataframe()
+    return df
+
+# .... App
+st.markdown("### Customer churn analytics")
+tab1, tab2, tab3  = st.tabs([" Customer churn raw data", "LLM ELT", "Anti-churn creative"])
+
+with tab1:
+    
+    df = read_table_dataframe(TABLE_ID)
+    agg_df = df.groupby('City').count().reset_index()
+    fig = px.bar(agg_df, x='City', y='Churn_Reason',height=300)
+    st.plotly_chart(fig, use_container_width=True)
+    sel_city = st.selectbox('**Select City**', df.City)
+    fil_df = df[df.City == sel_city]  
+    st.dataframe(fil_df,use_container_width=True)
+        
+
+with tab2:
+    with st.form("auto_form"):
+        st.write("Generate automated summary of churn reasons")
+        automate = st.form_submit_button("Launch LLM")
+        if automate:
+            batch_inference()
+    df = read_table_dataframe(TABLE_ID+"_batch_inference")
+    sel_city = st.selectbox('**Select City**', df.city)
+    fil_df = df[df.city == sel_city]  
+    st.dataframe(fil_df,use_container_width=True)
+            
+with tab3:
+    df = read_table_dataframe(TABLE_ID)
+    df_with_selections = df.copy()
+    df_with_selections.insert(0, "Select", False)
+
+    edited_df = st.data_editor(
+        df_with_selections,
+        hide_index=True,
+        column_config={"Select": st.column_config.CheckboxColumn(required=True)},
+        disabled=df.columns,
+    )
+
+    selected_rows = edited_df[edited_df.Select]
+    customer_id = selected_rows['Customer_ID'].values
+    
+    
+    with st.form("creative"):
+         st.write("Generate ideas anti churn")
+         creative = st.form_submit_button("Launch LLM")
+         if creative:
+            result = batch_inference_creative(customer_id[0])
+            st.write(result)           
+
+
+
+
+
+

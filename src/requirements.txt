@@ -1,0 +1,8 @@
+streamlit
+requests
+bigquery
+db-dtypes
+pandas
+pandas_gbq
+plotly-express 
+
