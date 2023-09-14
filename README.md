@@ -14,6 +14,7 @@ This repository inspired on [Telco Customer Churn Analysis in BigQuery with Gen-
 
 * From Cloud Shell, clone this repository
 * Login into your existing Argolis account, executing `gcloud auth login`
+* Make sure, the user has enough permissions (e.g. project owner )
 * Select your project `gcloud config set project PROJECT_ID`
 * Navigate to the `src` folder and locate the `setup_demo.sh` script
 * Launch the `setup_demo.sh` script, for example `setup_demo.sh ${GOOGLE_CLOUD_PROJECT}`
